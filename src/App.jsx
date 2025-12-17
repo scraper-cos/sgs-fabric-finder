@@ -17,7 +17,7 @@ function App() {
       const content = String(fabric['İçerik'] || '').toLowerCase();
       const width = String(fabric['En (cm)'] || '').toLowerCase();
       const weight = String(fabric['Gramaj (Gr)'] || '').toLowerCase();
-      const supplierName = "bocarlar kumaş"; // Hardcoded supplier name for search
+      const supplierName = "bocanlar tekstil"; // Hardcoded supplier name for search
 
       if (searchMode === 'sgs') {
         return sgsCode.includes(lowerTerm);
@@ -106,7 +106,7 @@ function App() {
 
               <div className="card-detail">
                 <span className="detail-label">Tedarikçi Firma</span>
-                <span className="detail-value">Bocarlar Kumaş</span>
+                <span className="detail-value">Bocanlar Tekstil</span>
               </div>
             </div>
           ))
@@ -140,7 +140,7 @@ function App() {
               </div>
               <div className="card-detail">
                 <span className="detail-label">Tedarikçi Firma:</span>
-                <span className="detail-value">Bocarlar Kumaş</span>
+                <span className="detail-value">Bocanlar Tekstil</span>
               </div>
             </div>
 
