@@ -13,7 +13,7 @@ function App() {
 
     return fabricData.filter(fabric => {
       const sgsCode = String(fabric['SGS Kodu'] || '').toLowerCase();
-      const supplierCode = String(fabric['Bocarlar Kodu'] || '').toLowerCase();
+      const supplierCode = String(fabric['Bocanlar Kodu'] || '').toLowerCase();
       const content = String(fabric['İçerik'] || '').toLowerCase();
       const width = String(fabric['En (cm)'] || '').toLowerCase();
       const weight = String(fabric['Gramaj (Gr)'] || '').toLowerCase();
@@ -86,7 +86,7 @@ function App() {
             >
               <div className="card-header">
                 <div className="card-title">SGS: {fabric['SGS Kodu']}</div>
-                <div className="info-badge">{fabric['Bocarlar Kodu']}</div>
+                <div className="info-badge">{fabric['Bocanlar Kodu']}</div>
               </div>
 
               <div className="card-detail">
@@ -123,7 +123,7 @@ function App() {
             <button className="modal-close" onClick={() => setSelectedFabric(null)}>×</button>
 
             <h2 className="modal-title">SGS: {selectedFabric['SGS Kodu']}</h2>
-            <div className="modal-badge">{selectedFabric['Bocarlar Kodu']}</div>
+            <div className="modal-badge">{selectedFabric['Bocanlar Kodu']}</div>
 
             <div className="modal-details">
               <div className="card-detail">
