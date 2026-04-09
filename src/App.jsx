@@ -19,11 +19,48 @@ function App() {
       })
       .then(data => {
         const normalizedData = data.map(row => {
-          let sgsCode = row['SGS Kodu'] || row['Firma Kodu'] || row['SGS KODU'];
-          let supplierCode = row['Bocanlar Kodu'] || row['Marka Moda Kodu'] || row['Tedarikçi Kodu'] || row['TEDARİKÇİ KODU'];
-          let content = row['İçerik'] || row['İçerik Bilgisi'] || row['Kumaş İçeriği'];
-          let width = row['En (cm)'] || row['En'] || row['Kumaş Eni'];
-          let weight = row['Gramaj (Gr)'] || row['Gramaj (gr)'] || row['Gramaj'];
+          let sgsCode = '';
+          let supplierCode = '';
+          let content = '';
+          let width = '';
+          let weight = '';
+          const supplierName = row['Tedarikçi Firma'] || 'Bilinmiyor';
+
+          Object.keys(row).forEach(key => {
+            const k = key.toLowerCase().trim();
+            const val = row[key];
+            const cleanVal = val !== undefined && val !== null ? String(val).trim() : '';
+
+            // SGS Kodu
+            if (cleanVal && (k === 'sgs kodu' || k === 'firma kodu' || k === 'sgs kod' || k === 'sgs')) {
+              sgsCode = cleanVal;
+            }
+            // İçerik
+            else if (cleanVal && (k.includes('i̇çerik') || k.includes('icerik') || k.includes('içerik'))) {
+              content = cleanVal;
+            }
+            // En
+            else if (cleanVal && ((k.includes('en') && k.length < 10) || k.includes('genişlik'))) {
+              width = cleanVal;
+            }
+            // Gramaj
+            else if (cleanVal && (k.includes('gramaj') || k === 'gr' || k.includes('ağırlık'))) {
+              weight = cleanVal;
+            }
+            // Tedarikçi Kodu (Anything with 'kodu' or 'kod' that isn't SGS or Firma)
+            else if (cleanVal && (k.includes('kodu') || k.includes('kod')) && !k.includes('sgs') && !k.includes('firma')) {
+              if (!supplierCode) {
+                supplierCode = cleanVal;
+              }
+            }
+          });
+
+          // Fallbacks if loop didn't catch something
+          if (!sgsCode) sgsCode = row['SGS Kodu'] || row['Firma Kodu'] || row['SGS KODU'] || '';
+          if (!supplierCode) supplierCode = row['COSMOS Moda Kodu'] || row['Bocarlar Kodu'] || row['Marka Moda Kodu'] || row['Tedarikçi Kodu'] || row['Bocanlar Kodu'] || row['Cosmos Kodu'] || '';
+          if (!content) content = row['İçerik'] || row['İçerik Bilgisi'] || '';
+          if (!width) width = row['En (cm)'] || row['En'] || '';
+          if (!weight) weight = row['Gramaj (Gr)'] || row['Gramaj'] || '';
 
           return {
             'SGS Kodu': sgsCode,
@@ -31,7 +68,7 @@ function App() {
             'İçerik': content,
             'En (cm)': width !== undefined ? width + '' : '',
             'Gramaj (Gr)': weight !== undefined ? weight + '' : '',
-            'Tedarikçi Firma': row['Tedarikçi Firma'] || 'Bilinmiyor'
+            'Tedarikçi Firma': supplierName
           };
         });
         setFabricData(normalizedData);
