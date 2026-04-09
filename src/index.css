@@ -352,3 +352,35 @@ body {
     transform: translateY(0);
   }
 }
+
+.loading-spinner {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: var(--accent-primary);
+  font-weight: 500;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .5;
+  }
+}
+
+.error-message {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #ef4444;
+  /* red 500 */
+  background-color: rgba(239, 68, 68, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
