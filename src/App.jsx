@@ -1,10 +1,48 @@
-import { useState, useMemo } from 'react'
-import fabricData from './data.json'
+import { useState, useEffect, useMemo } from 'react'
+
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcRRNNYgcIHr88tlnoL5TtkRnZvZl_LPhUZ-e6LKsjwERFPRRqWr1OUKLT84MY_ps/exec';
 
 function App() {
+  const [fabricData, setFabricData] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
   const [searchTerm, setSearchTerm] = useState('')
   const [searchMode, setSearchMode] = useState('all') // 'all', 'sgs', 'supplier'
   const [selectedFabric, setSelectedFabric] = useState(null)
+
+  useEffect(() => {
+    fetch(SCRIPT_URL)
+      .then(res => {
+        if (!res.ok) throw new Error('Ağ hatası oluştu');
+        return res.json();
+      })
+      .then(data => {
+        const normalizedData = data.map(row => {
+          let sgsCode = row['SGS Kodu'] || row['Firma Kodu'] || row['SGS KODU'];
+          let supplierCode = row['Bocanlar Kodu'] || row['Marka Moda Kodu'] || row['Tedarikçi Kodu'] || row['TEDARİKÇİ KODU'];
+          let content = row['İçerik'] || row['İçerik Bilgisi'] || row['Kumaş İçeriği'];
+          let width = row['En (cm)'] || row['En'] || row['Kumaş Eni'];
+          let weight = row['Gramaj (Gr)'] || row['Gramaj (gr)'] || row['Gramaj'];
+
+          return {
+            'SGS Kodu': sgsCode,
+            'Tedarikçi Kodu': supplierCode,
+            'İçerik': content,
+            'En (cm)': width !== undefined ? width + '' : '',
+            'Gramaj (Gr)': weight !== undefined ? weight + '' : '',
+            'Tedarikçi Firma': row['Tedarikçi Firma'] || 'Bilinmiyor'
+          };
+        });
+        setFabricData(normalizedData);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Data fetch error:', err);
+        setError('Veriler yüklenirken bir hata oluştu.');
+        setIsLoading(false);
+      });
+  }, []);
 
   const filteredFabrics = useMemo(() => {
     if (!searchTerm.trim()) return fabricData;
@@ -35,7 +73,7 @@ function App() {
         supplierName.includes(lowerTerm)
       );
     });
-  }, [searchTerm, searchMode]);
+  }, [searchTerm, searchMode, fabricData]);
 
   return (
     <div className="container">
@@ -51,24 +89,28 @@ function App() {
           placeholder="Kumaş kodu veya tedarikçi kodu ara..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          disabled={isLoading}
         />
 
         <div className="search-options">
           <button
             className={`filter-btn ${searchMode === 'all' ? 'active' : ''}`}
             onClick={() => setSearchMode('all')}
+            disabled={isLoading}
           >
             Tümü
           </button>
           <button
             className={`filter-btn ${searchMode === 'sgs' ? 'active' : ''}`}
             onClick={() => setSearchMode('sgs')}
+            disabled={isLoading}
           >
             SGS Kodu
           </button>
           <button
             className={`filter-btn ${searchMode === 'supplier' ? 'active' : ''}`}
             onClick={() => setSearchMode('supplier')}
+            disabled={isLoading}
           >
             Tedarikçi Kodu
           </button>
@@ -76,7 +118,11 @@ function App() {
       </div>
 
       <div className="results-grid">
-        {filteredFabrics.length > 0 ? (
+        {isLoading ? (
+          <div className="loading-spinner">Veriler e-tablodan yükleniyor...</div>
+        ) : error ? (
+          <div className="error-message">{error}</div>
+        ) : filteredFabrics.length > 0 ? (
           filteredFabrics.map((fabric, index) => (
             <div
               key={index}
@@ -161,3 +207,4 @@ function App() {
 }
 
 export default App
+
